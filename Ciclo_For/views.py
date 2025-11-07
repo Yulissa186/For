@@ -1,40 +1,16 @@
-from django.shortcuts import render
 from django.http import JsonResponse
-from antlr4 import *
-from .forLexer import forLexer
-from .forParser import forParser
-from .EvalVisitor import EvalVisitor
+from django.views.decorators.csrf import csrf_exempt
+import json
+from .main import main # importa la función del main
 
-
-def index(request):
-    return render(request, "Ciclo_For/index.html")
-
-
-def ejecutar_codigo(request):
+@csrf_exempt  # para pruebas; en producción es mejor usar token CSRF
+def ejecutar(request):
     if request.method == "POST":
-        codigo = request.POST.get("codigo", "")
         try:
-            # Crear flujo de entrada para ANTLR
-            input_stream = InputStream(codigo)
-            lexer = forLexer(input_stream)
-            stream = CommonTokenStream(lexer)
-            parser = forParser(stream)
-            tree = parser.prog()
-
-            # Crear el visitor e interpretar el código
-            visitor = EvalVisitor()
-            visitor.visit(tree)
-
-            # Recuperar resultados
-            resultado = visitor.memory            # Variables finales
-            iteraciones = visitor.logs            # Lista de iteraciones
-
-            return JsonResponse({
-                "resultado": str(resultado),
-                "iteraciones": iteraciones
-            })
-
+            data = json.loads(request.body)
+            codigo = data.get("codigo", "")
+            logs = main(codigo)
+            return JsonResponse({"logs": logs})
         except Exception as e:
-            return JsonResponse({"error": str(e)})
-
-    return JsonResponse({"error": "Método no permitido"})
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Método no permitido"}, status=405)
