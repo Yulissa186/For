@@ -26,6 +26,10 @@ SECRET_KEY = 'django-insecure-flzokgp9cqfqmow=5tce%5^fa9e7d+_hde^v$oy=2mzz^(sb8z
 DEBUG = False
 
 ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
+import os
+
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_URL = '/static/'
 
 
 
