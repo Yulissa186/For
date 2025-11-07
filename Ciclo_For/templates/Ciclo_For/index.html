@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora</title>
+    <style>
+        body {
+            background-color: #fafafa;
+            color: #222;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h2 {
+            margin-bottom: 10px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+        textarea {
+            width: 300px;
+            height: 100px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 8px;
+            resize: none;
+            font-size: 14px;
+            background: #fff;
+        }
+        button {
+            background: #222;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #444;
+        }
+        pre {
+            background: #fff;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            padding: 10px;
+            width: 300px;
+            min-height: 100px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            font-size: 14px;
+        }
+        h3 {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Ciclo FOR</h2>
+    <form id="formulario">
+        <textarea id="codigo" name="codigo" placeholder="Escribe tu código aquí..."></textarea>
+        <button type="submit">Ejecutar</button>
+    </form>
+
+    <h3>Iteracion</h3>
+    <pre id="iteraciones"></pre>
+
+    <script>
+        document.getElementById("formulario").addEventListener("submit", async function(e) {
+            e.preventDefault();
+            const codigo = document.getElementById("codigo").value;
+            const response = await fetch("/ejecutar/", {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": getCookie("csrftoken"),
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "codigo=" + encodeURIComponent(codigo)
+            });
+            const data = await response.json();
+
+            if (data.error) {
+                document.getElementById("iteraciones").textContent = "❌ Error: " + data.error;
+            } else {
+                document.getElementById("iteraciones").textContent = data.iteraciones.join("\n");
+            }
+        });
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== "") {
+                const cookies = document.cookie.split(";");
+                for (let cookie of cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith(name + "=")) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    </script>
+</body>
+</html>
