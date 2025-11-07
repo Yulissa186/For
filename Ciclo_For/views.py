@@ -4,12 +4,12 @@ from antlr4 import *
 from .forLexer import forLexer
 from .forParser import forParser
 from .EvalVisitor import EvalVisitor
-
+from django.views.decorators.csrf import csrf_exempt
 
 def index(request):
     return render(request, "Ciclo_For/index.html")
 
-
+@csrf_exempt  # elimina validación CSRF temporalmente (funciona en Render)
 def ejecutar_codigo(request):
     if request.method == "POST":
         codigo = request.POST.get("codigo", "")
@@ -29,6 +29,7 @@ def ejecutar_codigo(request):
             resultado = visitor.memory            # Variables finales
             iteraciones = visitor.logs            # Lista de iteraciones
 
+            # Devolver como JSON
             return JsonResponse({
                 "resultado": str(resultado),
                 "iteraciones": iteraciones
